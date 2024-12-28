@@ -1,0 +1,160 @@
+/*
+ * Copyright (c) 2023 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/keys.h>
+
+/* Uncomment this block if using RGB
+&led_strip {
+    chain-length = <6>;
+    // chain-length = <31>; // Uncomment if using both per-key and underglow LEDs
+    // chain-length = <25>; // Uncomment if using only per-key LEDs.
+};
+ */
+
+&mt { flavor = "tap-preferred"; };
+
+/ {
+    macros {
+        mac_de_ae: de_ae {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp LA(U) &kp A>;
+            label = "DE_AE";
+        };
+
+        mac_de_oe: de_oe {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp LA(U) &kp O>;
+            label = "DE_OE";
+        };
+
+        mac_de_ue: de_ue {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp LA(U) &kp U>;
+            label = "DE_UE";
+        };
+
+        de_s: de_s {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp RA(S)>;
+            label = "DE_S";
+        };
+
+        lw_de_ae: lw_de_ae {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp RA(Q)>;
+            label = "LW_DE_AE";
+        };
+
+        lw_de_oe: lw_de_oe {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp RA(P)>;
+            label = "LW_DE_OE";
+        };
+
+        lw_de_ue: lw_de_ue {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp RA(Y)>;
+            label = "LW_DE_UE";
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        mac {
+            bindings = <
+&kp J      &kp Y        &kp Z       &kp U       &kp A        &kp Q                                             &kp P        &kp B        &kp M       &kp L       &kp F        &de_s
+&kp ESC    &mt LCTRL C  &mt LALT S  &mt LGUI I  &mt LSHFT E  &kp O                                             &kp D        &mt RSHFT T  &mt RGUI N  &mt RALT R  &mt RCTRL H  &none
+&kp LSHFT  &kp V        &kp X       &mac_de_ue  &mac_de_ae   &mac_de_oe  &none      &none  &none  &none        &kp W        &kp G        &kp COMMA   &kp DOT     &kp K        &kp RSHFT
+                                    &none       &mo 6        &lt 3 BSPC  &lt 4 TAB  &none  &none  &lt 5 ENTER  &lt 2 SPACE  &mo 6        &none
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            label = "Mac";
+        };
+
+        lw {
+            bindings = <
+&kp J      &kp Y        &kp Z       &kp U       &kp A        &kp Q                                             &kp P        &kp B        &kp M       &kp L       &kp F        &de_s
+&kp ESC    &mt LCTRL C  &mt LALT S  &mt LGUI I  &mt LSHFT E  &kp O                                             &kp D        &mt RSHFT T  &mt RGUI N  &mt RALT R  &mt RCTRL H  &none
+&kp LSHFT  &kp V        &kp X       &lw_de_ue   &lw_de_ae    &lw_de_oe   &none      &none  &none  &none        &kp W        &kp G        &kp COMMA   &kp DOT     &kp K        &kp RSHFT
+                                    &none       &mo 6        &lt 3 BSPC  &lt 4 TAB  &none  &none  &lt 5 ENTER  &lt 2 SPACE  &mo 6        &none
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            label = "Linux/Windows";
+        };
+
+        sym {
+            bindings = <
+&none   &kp AT           &kp PLUS        &kp LBKT       &kp RBKT        &kp PRCNT                                  &kp TILDE  &kp BSLH        &kp DQT        &kp STAR       &kp SQT          &none
+&trans  &mt LCTRL MINUS  &mt LALT UNDER  &mt LGUI LPAR  &mt LSHFT RPAR  &kp AMPS                                   &kp PIPE   &mt RSHFT RBRC  &mt RGUI LBRC  &mt RALT FSLH  &mt RCTRL COLON  &trans
+&trans  &kp CARET        &kp DLLR        &kp LT         &kp GT          &kp HASH   &trans  &trans  &trans  &trans  &kp GRAVE  &kp EQUAL       &kp QMARK      &kp EXCL       &kp SEMI         &trans
+                                         &trans         &trans          &trans     &trans  &trans  &trans  &trans  &trans     &trans          &trans
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            label = "Sym";
+        };
+
+        nav {
+            bindings = <
+&none   &none      &none     &none     &none      &none                                   &none     &kp PG_UP  &kp UP    &kp PG_DN  &none    &none
+&trans  &kp LCTRL  &kp LALT  &kp LGUI  &kp LSHFT  &none                                   &kp HOME  &kp LEFT   &kp DOWN  &kp RIGHT  &kp END  &trans
+&trans  &none      &none     &none     &none      &none   &trans  &trans  &trans  &trans  &none     &none      &none     &none      &none    &trans
+                             &trans    &trans     &trans  &trans  &trans  &trans  &trans  &trans    &trans     &trans
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            label = "Nav";
+        };
+
+        num {
+            bindings = <
+&none   &none      &none     &none     &none      &none                                   &kp KP_DIVIDE  &kp KP_N4  &kp KP_N5  &kp KP_N6  &kp KP_PLUS      &kp KP_MULTIPLY
+&trans  &kp LCTRL  &kp LALT  &kp LGUI  &kp LSHFT  &none                                   &kp COLON      &kp KP_N1  &kp KP_N2  &kp KP_N3  &kp KP_SUBTRACT  &kp KP_EQUAL
+&trans  &none      &none     &none     &none      &none   &trans  &trans  &trans  &trans  &kp COMMA      &kp KP_N7  &kp KP_N8  &kp KP_N9  &kp KP_DOT       &trans
+                             &trans    &trans     &trans  &trans  &trans  &trans  &trans  &kp KP_N0      &trans     &trans
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            label = "Num";
+        };
+
+        fun {
+            bindings = <
+&bootloader  &none      &none     &none     &none      &none                                   &none   &kp F4  &kp F5  &kp F6  &kp F10  &none
+&trans       &kp LCTRL  &kp LALT  &kp LGUI  &kp LSHFT  &none                                   &none   &kp F1  &kp F2  &kp F3  &kp F11  &trans
+&trans       &none      &none     &none     &none      &none   &trans  &trans  &trans  &trans  &none   &kp F7  &kp F8  &kp F9  &kp F12  &trans
+                                  &trans    &trans     &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            label = "Fun";
+        };
+
+        adjust {
+            bindings = <
+&none   &none  &bt BT_CLR  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2                                  &to 0   &none   &none   &none  &none  &none
+&trans  &none  &none       &bt BT_SEL 3  &bt BT_SEL 4  &none                                         &to 1   &none   &none   &none  &none  &trans
+&trans  &none  &none       &none         &none         &none         &trans  &trans  &trans  &trans  &none   &none   &none   &none  &none  &trans
+                           &trans        &trans        &trans        &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
+            label = "Adjust";
+        };
+    };
+};
