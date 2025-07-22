@@ -1,9 +1,4 @@
-/*
- * Copyright (c) 2023 The ZMK Contributors
- *
- * SPDX-License-Identifier: MIT
- */
-
+#include <behaviors/num_word.dtsi>
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
@@ -16,10 +11,42 @@
 };
  */
 
+
+#define TAPHOLD_TP(NAME, TAP, HOLD) \
+         NAME: NAME { \
+            compatible = "zmk,behavior-hold-tap"; \
+            flavor = "tap-preferred"; \
+            #binding-cells = <2>; \
+            tapping-term-ms = <TAPPING_TERM>; \
+            quick-tap-ms = <QUICK_TAP_TERM>; \
+            require-prior-idle-ms = <QUICK_TAP_TERM>; \
+            bindings = <HOLD>, <TAP>; \
+        };
+
+/ {
+    symbols {
+        TAPHOLD_TP(th_lpar,         &mac_de_ae, &de_s)
+    };
+};
+
 &mt { flavor = "tap-preferred"; };
+
+&sl { ignore-modifiers; };
 
 / {
     macros {
+   shifted: macro_shifted_kp {
+      #binding-cells = <1>;
+      label = "MACRO_SHIFTED_KP";
+      compatible = "zmk,behavior-macro-one-param";
+      bindings =
+        <&macro_press &kp LSHFT>,
+        <&macro_param_1to1 &macro_tap &kp MACRO_PLACEHOLDER>,
+        <&macro_release &kp LSHFT>;
+    };
+
+
+
         mac_de_ae: de_ae {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
@@ -92,24 +119,23 @@
     };
 
     behaviors {
-        as: auto_shift {
-            compatible = "zmk,behavior-hold-tap";
-            #binding-cells = <2>;
-            tapping_term_ms = <135>;
-            quick_tap_ms = <0>;
-            flavor = "tap-preferred";
-            bindings = <&kp>, <&lgui_r>;
+as: autoshift {
+        compatible = "zmk,behavior-hold-tap";
+        label = "ZM_autoshift";
+        #binding-cells = <2>;
+        tapping-term-ms = <180>;
+        quick-tap-ms = <0>;
+        flavor = "balanced";
+        bindings = <&kp &kp>;
+    };
 
-            retro-tap;
-        };
-
-        mac_de_ae_shift: mac_de_ae_shift {
+        mac_deae: mac_deae_cool {
             compatible = "zmk,behavior-mod-morph";
-            label = "MAC_DE_AE_SHIFT";
+            label = "MAC_DEAE";
             bindings = <&mac_de_ae>, <&mac_de_ae_capital>;
 
             #binding-cells = <0>;
-            mods = <(MOD_LSFT)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
         };
 
         new_behavior: new_behavior {
@@ -131,6 +157,24 @@
             mods = <(MOD_LGUI)>;
             keep-mods = <(MOD_LSFT)>;
         };
+
+        coln_double: coln_double {
+            compatible = "zmk,behavior-mod-morph";
+            label = "COLN_DOUBLE";
+            bindings = <&kp COLON>, <&kp UNDERSCORE>;
+
+            #binding-cells = <0>;
+            mods = <(MOD_LSFT|MOD_RCTL)>;
+        };
+    };
+
+    combos {
+        compatible = "zmk,combos";
+         combo_esc {
+            timeout-ms = <50>;
+            key-positions = <19 20>;
+            bindings = <&th_lpar>;
+        };
     };
 
     keymap {
@@ -138,10 +182,10 @@
 
         mac {
             bindings = <
-&kp TAB   &kp F       &kp P    &kp D        &kp L        &kp X                                                     &kp SEMI   &kp U          &kp O        &kp Y      &kp B       &kp Z
-&kp BSPC  &mt LALT S  &lt 2 N  &mt LSHFT T  &lt 3 H      &kp K                                                     &kp COMMA  &lt 4 A        &mt RSHFT E  &lt 2 I    &mt RALT C  &kp Q
-&trans    &kp V       &kp W    &kp G        &mt LCTRL M  &kp J  &none       &mo 6       &mac_lock  &none           &kp MINUS  &mt RCTRL DOT  &kp SQT      &kp EQUAL  &sl 7       &kp RET
-                               &none        &none        &none  &mt LGUI R  &as LGUI R  &none      &mt RGUI SPACE  &mo 5      &none          &none
+&kp TAB   &num_word 4  &kp P    &kp D        &kp L        &kp X                                                     &kp SEMI   &kp U          &kp O        &kp Y      &kp B       &kp Z
+&kp BSPC  &kp S      &lt 2 N  &mt LSHFT T  &lt 4 H      &kp K                                                     &kp COMMA  &lt 5 A        &mt RSHFT E  &lt 2 I    &mt RALT C  &kp Q
+&trans    &sl 8        &kp W    &kp G        &mt LCTRL M  &kp J  &none       &mo 7       &mac_lock  &none           &kp MINUS  &mt RCTRL DOT  &kp SQT      &kp EQUAL  &sl 8       &kp RET
+                                &none        &none        &none  &mt LGUI R  &kp S  &none      &mt RGUI SPACE  &mo 6      &none          &none
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
@@ -150,10 +194,10 @@
 
         lw {
             bindings = <
-&kp J      &kp Y        &kp Z       &kp U       &kp A        &kp Q                                              &kp P       &kp B        &kp M       &kp L       &kp F        &de_s
-&kp TAB    &mt LCTRL C  &mt LALT S  &mt LGUI I  &mt LSHFT E  &kp O                                              &kp D       &mt RSHFT T  &mt RGUI N  &mt RALT R  &mt RCTRL H  &key_repeat
-&kp LSHFT  &kp V        &kp X       &lw_de_ue   &lw_de_ae    &lw_de_oe    &none      &none  &none  &none        &kp W       &kp G        &kp COMMA   &kp DOT     &kp K        &kp RSHFT
-                                    &none       &mo 6        &lt 3 SPACE  &lt 4 ESC  &none  &none  &lt 5 ENTER  &lt 2 BSPC  &mo 6        &none
+&kp J      &kp Y        &kp Z    &kp U       &kp A        &kp Q                                              &kp P       &kp B        &kp M       &kp L       &kp F        &de_s
+&kp TAB    &mt LCTRL C  &lt 3 S  &mt LGUI I  &mt LSHFT E  &kp O                                              &kp D       &mt RSHFT T  &mt RGUI N  &mt RALT R  &mt RCTRL H  &key_repeat
+&kp LSHFT  &kp V        &kp X    &lw_de_ue   &lw_de_ae    &lw_de_oe    &none      &none  &none  &none        &kp W       &kp G        &kp COMMA   &kp DOT     &kp K        &kp RSHFT
+                                 &none       &mo 7        &lt 4 SPACE  &lt 5 ESC  &none  &none  &lt 6 ENTER  &lt 2 BSPC  &mo 7        &none
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
@@ -170,6 +214,15 @@
 
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
             label = "Sym";
+        };
+
+        layer_8 {
+            bindings = <
+&trans  &trans         &trans  &trans  &trans  &trans                                  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &kp AMPERSAND  &trans  &trans  &trans  &trans                                  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans         &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+                               &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            >;
         };
 
         nav {
@@ -210,10 +263,10 @@
 
         adjust {
             bindings = <
-&none   &none  &bt BT_CLR  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2                                  &to 0   &none   &none   &none  &none  &none
-&trans  &none  &none       &bt BT_SEL 3  &bt BT_SEL 4  &none                                         &to 1   &none   &none   &none  &none  &trans
-&trans  &none  &none       &none         &none         &none         &trans  &trans  &trans  &trans  &none   &none   &none   &none  &none  &trans
-                           &trans        &trans        &trans        &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&none   &none  &bt BT_CLR  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2                                    &to 0   &none   &none   &none  &none  &none
+&trans  &none  &none       &bt BT_SEL 3  &bt BT_SEL 4  &studio_unlock                                  &to 1   &none   &none   &none  &none  &trans
+&trans  &none  &none       &none         &none         &none           &trans  &trans  &trans  &trans  &none   &none   &none   &none  &none  &trans
+                           &trans        &trans        &trans          &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp PG_UP PG_DN>;
@@ -222,10 +275,10 @@
 
         mac_de {
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &trans                                  &trans  &mac_de_ue          &mac_de_oe  &trans  &trans  &trans
-&trans  &de_s   &trans  &trans  &trans  &trans                                  &trans  &mac_de_ae_capital  &trans      &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans              &trans      &trans  &trans  &trans
-                        &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans              &trans
+&trans  &trans  &trans     &trans  &trans  &trans                                  &trans  &mac_de_ue  &mac_de_oe  &trans  &trans  &trans
+&trans  &de_s   &mac_deae  &trans  &trans  &trans                                  &trans  &mac_deae   &kp RSHFT   &trans  &trans  &trans
+&trans  &trans  &trans     &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans      &trans      &trans  &trans  &trans
+                           &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans      &trans
             >;
 
             label = "Mac DE";
